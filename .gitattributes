@@ -1,0 +1,26 @@
+# Normalize line endings on checkout
+* text=auto eol=lf
+
+# Windows scripts keep CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Source files
+*.go   text eol=lf diff=golang
+*.md   text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+*.toml text eol=lf
+
+# Binary files — never diff or merge
+*.exe    binary
+*.dll    binary
+*.so     binary
+*.dylib  binary
+
+# GitHub Linguist
+docs/**      linguist-documentation
+examples/**  linguist-documentation
+*.md         linguist-documentation
