@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-label="Codex Genome">
+  <defs>
+    <!-- Dot grid for subtle background texture -->
+    <pattern id="dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#1E293B"/>
+    </pattern>
+
+    <!-- Ambient purple glow behind the icon -->
+    <radialGradient id="ambientGlow" cx="32%" cy="50%" r="38%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Glow filter applied to the root node only -->
+    <filter id="rootGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blurred"/>
+      <feMerge>
+        <feMergeNode in="blurred"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="400" fill="#0F172A"/>
+  <rect width="1280" height="400" fill="url(#dots)" opacity="0.55"/>
+  <rect width="1280" height="400" fill="url(#ambientGlow)"/>
+
+  <!-- ─────────────────────────────────────────────────────────
+       ICON — Dependency graph (DAG), placed in left panel
+       Represents: codebase structure / package graph
+       ───────────────────────────────────────────────────────── -->
+
+  <!-- Edges: root → level-1 -->
+  <line x1="138" y1="200" x2="252" y2="128" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="138" y1="200" x2="252" y2="200" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="138" y1="200" x2="252" y2="272" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Edges: level-1 → level-2 (including shared edge to show DAG, not just a tree) -->
+  <line x1="252" y1="128" x2="356" y2="108" stroke="#1E293B" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="252" y1="128" x2="356" y2="158" stroke="#1E293B" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="252" y1="200" x2="356" y2="158" stroke="#1E293B" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="252" y1="200" x2="356" y2="232" stroke="#1E293B" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="252" y1="272" x2="356" y2="282" stroke="#1E293B" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Root node — filled purple, glowing -->
+  <circle cx="138" cy="200" r="17" fill="#7C3AED" filter="url(#rootGlow)"/>
+  <circle cx="138" cy="200" r="17" fill="none" stroke="#A78BFA" stroke-width="1" opacity="0.45"/>
+
+  <!-- Level-1 nodes -->
+  <circle cx="252" cy="128" r="11" fill="#0F172A" stroke="#7C3AED" stroke-width="1.5"/>
+  <circle cx="252" cy="200" r="11" fill="#0F172A" stroke="#7C3AED" stroke-width="1.5"/>
+  <circle cx="252" cy="272" r="11" fill="#0F172A" stroke="#7C3AED" stroke-width="1.5"/>
+
+  <!-- Level-2 nodes -->
+  <circle cx="356" cy="108" r="7" fill="#0F172A" stroke="#4C1D95" stroke-width="1.5"/>
+  <circle cx="356" cy="158" r="7" fill="#0F172A" stroke="#4C1D95" stroke-width="1.5"/>
+  <circle cx="356" cy="232" r="7" fill="#0F172A" stroke="#4C1D95" stroke-width="1.5"/>
+  <circle cx="356" cy="282" r="7" fill="#0F172A" stroke="#4C1D95" stroke-width="1.5"/>
+
+  <!-- ─────────────────────────────────────────────────────────
+       DIVIDER
+       ───────────────────────────────────────────────────────── -->
+  <line x1="460" y1="56" x2="460" y2="344" stroke="#1E293B" stroke-width="1"/>
+
+  <!-- ─────────────────────────────────────────────────────────
+       TEXT — Right panel, centered at x=870
+       ───────────────────────────────────────────────────────── -->
+
+  <!-- Project name -->
+  <text
+    x="870" y="178"
+    font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+    font-size="68"
+    font-weight="700"
+    fill="#F1F5F9"
+    text-anchor="middle"
+    letter-spacing="-1.5">Codex Genome</text>
+
+  <!-- Tagline -->
+  <text
+    x="870" y="232"
+    font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+    font-size="22"
+    font-weight="400"
+    fill="#64748B"
+    text-anchor="middle"
+    letter-spacing="0.3">Structural intelligence for your codebase.</text>
+
+  <!-- CLI hint -->
+  <text
+    x="870" y="298"
+    font-family="'SF Mono', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace"
+    font-size="15"
+    font-weight="400"
+    fill="#334155"
+    text-anchor="middle">$ codex-genome analyze .</text>
+</svg>

@@ -1,29 +1,54 @@
-# ◈ Codex Genome
+![Codex Genome](docs/banner.svg)
 
-A command-line tool for analyzing the structure and composition of software projects.
+<div align="center">
+
+[![CI](https://github.com/codexgenome/codex-genome/actions/workflows/ci.yml/badge.svg)](https://github.com/codexgenome/codex-genome/actions/workflows/ci.yml)
+[![Go 1.23+](https://img.shields.io/badge/go-1.23%2B-00ADD8?logo=go&logoColor=white&style=flat-square)](go.mod)
+[![License: MIT](https://img.shields.io/badge/license-MIT-7C3AED?style=flat-square)](LICENSE)
+
+</div>
 
 ---
 
-## What it does
+Codex Genome is a command-line tool for analyzing the structure and composition of software projects. Point it at a directory and it tells you what is there: file counts, language breakdown, directory layout — without reading a single line of source code.
 
-Codex Genome scans a directory and produces a structured report: file counts, directory layout, extension breakdown, and language distribution. The analysis pipeline is designed to grow incrementally — each engine is independent and composable without touching existing code.
+---
 
-## Why it exists
+## Why Codex Genome?
 
-Most tools that inspect a project either do too much (full IDE-level analysis) or too little (a few shell one-liners). Codex Genome occupies the middle ground: a focused, inspectable pipeline that starts with filesystem discovery and can be extended engine by engine.
+When you arrive at an unfamiliar codebase, the first question is structural: *what am I looking at?* How large is it? What languages? How is it organized?
+
+Existing tools each solve part of this:
+
+| Tool | What it does | What it does not cover |
+|---|---|---|
+| `find` + `wc` | Counts files | No language mapping, raw output |
+| IDE project view | Visual file tree | Requires the project to be open in an IDE |
+| `cloc` | Lines of code per language | No filesystem layout, no extension breakdown |
+| GitHub language bar | Language percentages | Requires a push to GitHub, no local analysis |
+
+Codex Genome runs locally, needs no configuration, and produces a structured terminal report in milliseconds.
 
 ## Features
 
-- Recursive filesystem scanning with configurable ignore rules
+**Filesystem scanning**
+- Recursive directory walk with deterministic, lexicographic ordering
+- Built-in ignore list: `.git`, `node_modules`, `vendor`, `dist`, `build`
+- Graceful handling of permission-restricted entries
+
+**Analysis**
 - File extension breakdown with proportional bar chart
-- Language detection for 30+ languages and formats
-- In-memory project tree representation
-- Professional terminal output
+- Language detection across 30+ languages and configuration formats
+- Language distribution with percentage share of total files
+- Primary language identification
+
+**Output**
+- Structured terminal report with consistent visual hierarchy
 - Cross-platform: Linux, macOS, Windows
 
 ## Installation
 
-**Build from source** (requires Go 1.23+)
+**Build from source** (Go 1.23+ required)
 
 ```bash
 git clone https://github.com/codexgenome/codex-genome
@@ -37,20 +62,11 @@ go build -o codex-genome .
 go install github.com/codexgenome/codex-genome@latest
 ```
 
-## Usage
-
-```bash
-# Analyze the current directory
-codex-genome analyze .
-
-# Analyze a specific path
-codex-genome analyze /path/to/project
-codex-genome analyze C:\Projects\MyApp
-```
-
-## Example output
+## Example
 
 ```
+$ codex-genome analyze ~/projects/myapp
+
  ◈ Codex Genome  /home/user/projects/myapp
 ──────────────────────────────────────────────────────────────
 
@@ -87,62 +103,82 @@ codex-genome analyze C:\Projects\MyApp
 
 ## Architecture
 
-The codebase is organized as a pipeline of single-responsibility packages:
+Codex Genome is a pipeline. Each package has exactly one responsibility and data flows in one direction.
 
-```
-cmd/
-  root.go          Cobra root command
-  analyze.go       analyze subcommand and orchestration
-
-internal/
-  filesystem/      Path resolution and validation
-  scanner/         Recursive filesystem discovery, domain models
-  tree/            In-memory project tree construction
-  language/        Extension → language name mapping
-  analyzer/        Metric aggregation from scan results
-  report/          Terminal output rendering
-
-pkg/               Reserved for future exportable libraries
-docs/              Reserved for extended documentation
-examples/          Reserved for example integrations
+```mermaid
+graph LR
+    filesystem --> scanner
+    scanner --> tree
+    scanner --> analyzer
+    language --> analyzer
+    analyzer --> report
+    cmd --> scanner
+    cmd --> analyzer
+    cmd --> report
 ```
 
-Data flows in one direction:
+| Package | Responsibility |
+|---|---|
+| `filesystem` | Path resolution and validation |
+| `scanner` | Recursive filesystem walk, domain models (`Project`, `File`, `Directory`) |
+| `tree` | In-memory project tree construction |
+| `language` | Extension-to-language name mapping |
+| `analyzer` | Metric aggregation from scan results |
+| `report` | Terminal output rendering |
+| `cmd` | CLI command definitions and orchestration |
 
-```
-scanner → tree        (independent, not yet wired to render)
-scanner → analyzer → report
-```
+No package imports from a layer above it. The `tree` package is built and independent; it will be wired to the renderer in v0.2.
 
-No package imports from a layer above it. No circular dependencies.
+## Project Philosophy
 
-## Ignored directories
+**Separation of concerns.** The scanner discovers. The analyzer aggregates. The renderer displays. These are different jobs, and coupling them is how codebases become hard to change.
 
-The scanner skips the following by default:
+**No speculative code.** Every package solves a concrete, current problem. No TODO comments in source files. No planned-but-not-built features in the package tree.
 
-`.git` · `node_modules` · `vendor` · `dist` · `build`
+**Honest output.** Codex Genome reports what it finds. It does not assign health scores, make recommendations, or weight results based on opinion.
+
+**Standard library first.** Third-party dependencies are added only when the standard library cannot reasonably solve the problem. Current external dependencies: [Cobra](https://github.com/spf13/cobra) (CLI framework) and [Lipgloss](https://github.com/charmbracelet/lipgloss) (terminal styling).
+
+**Incremental delivery.** Each pull request delivers one complete, working thing. No half-built engines, no temporary scaffolding left in place.
 
 ## Roadmap
 
+### v0.1 — Foundation (current)
+
+- [x] Recursive filesystem scanner with ignore rules
+- [x] Domain models — `Project`, `File`, `Directory`
+- [x] In-memory project tree
+- [x] Language detection (30+ languages)
+- [x] Extension distribution with bar chart
+- [x] Language distribution with percentages and primary language
+
+### v0.2 — Depth
+
 - [ ] Gitignore-aware scanning
 - [ ] Lines of code per language
-- [ ] Dependency graph extraction (imports, modules)
-- [ ] Tree view rendering
-- [ ] JSON and CSV output formats
-- [ ] Project health scoring
-- [ ] Watch mode
+- [ ] Tree view rendering (`--tree` flag)
+- [ ] File size distribution
 
-## Development philosophy
+### v0.3 — Dependencies
 
-- Each PR delivers one complete, working thing.
-- The scanner only discovers. Analyzers only aggregate. The renderer only renders.
-- No speculative code. No TODO comments in source files.
-- Standard library preferred over third-party dependencies.
-- If something needs an interface to justify it, it probably does not need an interface.
+- [ ] Go module dependency extraction (`go.mod` analysis)
+- [ ] Import graph per package
+
+### v0.4 — Output Formats
+
+- [ ] JSON output (`--format json`)
+- [ ] CSV output (`--format csv`)
+- [ ] Silent mode for use in scripts
+
+### v1.0 — Stable
+
+- [ ] Stable CLI interface (no breaking changes after this point)
+- [ ] Complete test suite with coverage reporting
+- [ ] Configuration file (`.codexgenome.toml`)
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for branching strategy, commit conventions, coding standards, and the PR process.
 
 ## License
 
