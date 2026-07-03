@@ -1,0 +1,17 @@
+# Build artifacts
+codex-genome
+codex-genome.exe
+
+# Go
+*.test
+*.out
+coverage.html
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
